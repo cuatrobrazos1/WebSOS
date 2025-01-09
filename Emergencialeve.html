@@ -1,0 +1,49 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario SOS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sos-window">
+  <h1 class="sos-title">Formulario de Emergencia</h1>
+  <form action="#" method="post">
+    <label for="name">Nombre completo:</label>
+    <input type="text" id="name" name="name" placeholder="Ingresa tu nombre" required="">
+
+    <label for="email">Correo electrónico:</label>
+    <input type="email" id="email" name="email" placeholder="Ingresa tu correo" required="">
+
+    <label for="phone">Número de teléfono:</label>
+    <input type="tel" id="phone" name="phone" placeholder="Ingresa tu teléfono" required="">
+
+    <label for="address">Dirección:</label>
+    <input type="text" id="address" name="address" placeholder="Ingresa tu dirección" required="">
+    <div class="checkbox-group">
+      <label>
+        <input value="policia" type="checkbox" id="policia" name="servicio[]">
+        Avisar a la Policía
+      </label>
+      <label>
+        <input value="bomberos" type="checkbox" id="bomberos" name="servicio[]">
+        Avisar a los Bomberos
+      </label>
+      <label>
+        <input value="ambulancia" type="checkbox" id="ambulancia" name="servicio[]">
+        Avisar a la Ambulancia
+      </label>
+    </div>
+    <button type="submit" class="sos-button">Enviar Selección</button>
+
+  </form>
+  <div class ='under-button'>
+    <a href="EmergenciaGRAVE.html">
+      <button>EMERGENCIA</button>
+    </a>
+    <a href="PERSONAL.html">
+      <button>Informacion Personal</button>
+    </a>
+  </div>
+</div>
+
+</body></html>

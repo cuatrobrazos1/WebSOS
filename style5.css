@@ -1,0 +1,164 @@
+/* Estilo para la página de inicio de sesión */
+body.pagina-registro {
+    font-family: 'Arial', sans-serif;
+    background-color: #e6303e; /* Fondo rojo */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+    flex-direction: column; /* Alineación vertical */
+}
+
+/* Header */
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+}
+
+header h2 {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+/* Formulario */
+.formulario {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.campo {
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #264653;
+    box-shadow: 0 0 5px rgba(38, 70, 83, 0.5);
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #264653;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+p {
+    font-size: 14px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+p a {
+    color: #264653;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+/* Media Queries para Responsividad */
+
+/* Para pantallas pequeñas (móviles) */
+@media (max-width: 480px) {
+    body.pagina-registro {
+        padding: 10px; /* Espaciado en pantallas pequeñas */
+    }
+
+    header h1 {
+        font-size: 28px; /* Reducir tamaño del título en pantallas pequeñas */
+    }
+
+    header h2 {
+        font-size: 20px; /* Reducir tamaño del subtítulo en pantallas pequeñas */
+    }
+
+    .formulario {
+        padding: 20px; /* Reducir padding del formulario en pantallas pequeñas */
+        width: 100%;
+        max-width: 320px; /* Limitar el tamaño máximo del formulario */
+    }
+
+    .campo input {
+        font-size: 14px; /* Reducir tamaño de fuente en los campos */
+    }
+
+    button {
+        font-size: 16px; /* Reducir tamaño de fuente del botón */
+        padding: 12px; /* Reducir padding del botón */
+    }
+
+    p {
+        font-size: 12px; /* Reducir tamaño de fuente del párrafo */
+    }
+}
+
+/* Para pantallas medianas (tablets) */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 32px; /* Reducir tamaño del título en tablets */
+    }
+
+    header h2 {
+        font-size: 22px; /* Reducir tamaño del subtítulo en tablets */
+    }
+
+    .formulario {
+        padding: 25px; /* Ajustar padding del formulario */
+        width: 100%;
+        max-width: 350px; /* Ajustar tamaño máximo del formulario */
+    }
+
+    button {
+        font-size: 17px; /* Ajustar tamaño de fuente del botón */
+        padding: 14px; /* Ajustar padding del botón */
+    }
+
+    p {
+        font-size: 13px; /* Ajustar tamaño de fuente del párrafo */
+    }
+}

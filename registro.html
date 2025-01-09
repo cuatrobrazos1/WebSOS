@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro</title>
+  <link rel="stylesheet" href="style4.css">
+</head>
+<body class="pagina-registro"> <!-- Usamos la clase para el color de fondo -->
+<header>
+  <h1>VITAL SOS</h1>
+  <h2>Registrarse</h2>
+</header>
+
+<section class="formulario">
+  <form action="procesarRegistro.php" method="POST">
+    <div class="campo">
+      <label for="nombre">Nombre Completo:</label>
+      <input type="text" id="nombre" name="nombre" required>
+    </div>
+
+    <div class="campo">
+      <label for="correo">Correo Electrónico:</label>
+      <input type="email" id="correo" name="correo" required>
+    </div>
+
+    <div class="campo">
+      <label for="contrasena">Contraseña:</label>
+      <input type="password" id="contrasena" name="contrasena" required>
+    </div>
+
+    <div class="campo">
+      <label for="confirmarContrasena">Confirmar Contraseña:</label>
+      <input type="password" id="confirmarContrasena" name="confirmarContrasena" required>
+    </div>
+
+    <button type="submit">Registrarse</button>
+  </form>
+
+  <p>¿Ya tienes una cuenta? <a href="inicioSesion.html">Iniciar sesión</a></p>
+</section>
+<script src="registro.js"></script>
+</body>
+</html>

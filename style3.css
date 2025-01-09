@@ -1,0 +1,91 @@
+/* Estilos generales para la página */
+body.pagina-entrada {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e6303e; /* Fondo rojo para toda la página */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Contenedor de la foto */
+.foto-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.foto-inicial {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s ease-in-out;
+}
+
+/* Botones */
+.botones {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    align-items: center;
+    text-align: center;
+    background-color: #ffffff; /* Fondo blanco para la sección de botones */
+    padding: 30px;
+    border-radius: 15px; /* Bordes redondeados para la caja de botones */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para que se distinga de fondo rojo */
+    z-index: 2; /* Asegura que los botones estén por encima de la imagen */
+}
+
+.botones a {
+    text-decoration: none;
+}
+
+.botones button {
+    background-color: #264653;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    width: 250px;
+    text-align: center;
+}
+
+.botones button:hover {
+    background-color: #2a6f83;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.botones button:active {
+    transform: scale(0.98);
+    box-shadow: none;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .botones button {
+        font-size: 14px;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .botones button {
+        font-size: 12px;
+        padding: 10px 18px;
+    }
+}
