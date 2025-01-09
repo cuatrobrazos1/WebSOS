@@ -1,49 +1,55 @@
 <?php
-// Datos de conexión a la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "vitalsos";
-
-// Crear conexión
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Verificar conexión
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
-}
-
-// Verificar si los datos fueron enviados
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nombre = $_POST['nombre'];
-    $correo = $_POST['correo'];
-    $telefonoEmg = $_POST['telefonoEmg'];
-    $contrasena = $_POST['contraseña'];
-    $confirmarContrasena = $_POST['confirmarContrasena'];
+    // Validar y obtener los datos del formulario
+    $nombre = $_POST["nombre"] ?? null;
+    $correo = $_POST["correo"] ?? null;
+    $tel = $_POST["telefonoEmg"] ?? null;
+    $pass = $_POST["contrasena"] ?? null;
 
-    // Verificar que las contraseñas coincidan
-    if ($contrasena !== $confirmarContrasena) {
-        echo "<p>Las contraseñas no coinciden. Por favor, inténtalo de nuevo.</p>";
-        exit;
+    // Verificar si se enviaron todos los datos requeridos
+    if (!$nombre || !$correo || !$tel || !$pass) {
+        die("Error: Todos los campos son obligatorios.");
     }
 
-    // Encriptar la contraseña
-    $hashed_password = password_hash($contrasena, PASSWORD_DEFAULT);
+    // Configuración de la base de datos
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "vitalsos";
 
-    // Preparar y ejecutar la consulta SQL
+    // Crear la conexión
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    if ($conn->connect_error) {
+        die("Conexión fallida: " . $conn->connect_error);
+    }
+
+    // Encriptar la contraseña de forma segura
+    $new_pass = password_hash($pass, PASSWORD_BCRYPT);
+
+    // Construir la consulta preparada para evitar inyección SQL
     $sql = "INSERT INTO usuarios (nombre, contraseña, mail, telefono_emergencia) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssi", $nombre, $hashed_password, $correo, $telefonoEmg);
 
-    if ($stmt->execute()) {
-        echo "<p>Registro exitoso. Ahora puedes <a href='inicioSesion.html'>iniciar sesión</a>.</p>";
-    } else {
-        echo "<p>Error: " . $stmt->error . "</p>";
+    if (!$stmt) {
+        die("Error al preparar la consulta: " . $conn->error);
     }
 
-    // Cerrar la declaración y la conexión
-    $stmt->close();
-}
+    // Asociar los parámetros
+    $stmt->bind_param("ssss", $nombre, $new_pass, $correo, $tel);
 
-$conn->close();
+    // Ejecutar la consulta
+    if ($stmt->execute()) {
+        // Redirigir a la página de confirmación
+        header("Location: finRegistro.html");
+        exit();
+    } else {
+        echo "Error al insertar datos: " . $stmt->error;
+    }
+
+    // Cerrar la conexión
+    $stmt->close();
+    $conn->close();
+} else {
+    echo "Error: Método no permitido.";
+}
 ?>

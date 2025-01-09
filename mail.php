@@ -7,6 +7,9 @@ require 'PHPMailer-master/src/Exception.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+// Iniciar sesión para capturar el ID del usuario autenticado
+session_start();
+
 // Configuración de conexión a la base de datos
 $servername = "localhost";
 $username = "root";
@@ -19,6 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($tipoEmergencia)) {
         http_response_code(400);
         echo json_encode(["error" => "Faltan datos requeridos"]);
+        exit;
+    }
+
+    // Obtener el ID del usuario desde la sesión
+    $usuarioId = $_SESSION['user_id'] ?? null;
+
+    if (empty($usuarioId)) {
+        http_response_code(403);
+        echo json_encode(["error" => "Usuario no autenticado"]);
         exit;
     }
 
@@ -38,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->setFrom('vitalsosgrupo2@gmail.com', 'Sistema de Emergencias');
         $mail->isHTML(true);
 
+        // Manejo de emergencia leve
         if ($tipoEmergencia === "leve") {
             $name = $_POST['name'] ?? 'No especificado';
             $email = $_POST['email'] ?? 'No especificado';
@@ -55,11 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->addAddress($email);
             $mail->Subject = "Emergencia Leve";
             $mail->Body = $mensaje;
+
+        // Manejo de emergencia grave
         } elseif ($tipoEmergencia === "grave") {
             $name = $_POST['name'] ?? 'No especificado';
             $email = $_POST['email'] ?? 'No especificado';
             $phone = $_POST['phone'] ?? 'No especificado';
-            $address = $_POST['address'] ?? 'No especificado';
             $ubicacion = $_POST['ubicacion'] ?? 'No especificado';
             $servicios = isset($_POST['servicio']) ? implode(", ", $_POST['servicio']) : "Ninguno";
 
@@ -70,7 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Conexión fallida: " . $conn->connect_error);
             }
 
-            $sql = "INSERT INTO emergencias (nombre_usuario, mail_usuario, telefono_usuario, ubicacion, servicios, tipo_emergencia) VALUES (?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO emergencias (ID_Usuario, nombre_usuario, mail_usuario, telefono_usuario, ubicacion, servicios, tipo_emergencia)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
 
             if (!$stmt) {
@@ -78,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $tipoEmergenciaGrave = "grave";
-            $stmt->bind_param("ssisss", $name, $email, $phone, $ubicacion, $servicios, $tipoEmergenciaGrave);
+            $stmt->bind_param("issssss", $usuarioId, $name, $email, $phone, $ubicacion, $servicios, $tipoEmergenciaGrave);
 
             if (!$stmt->execute()) {
                 throw new Exception("Error al guardar en la base de datos: " . $stmt->error);
@@ -87,7 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje = "<p><strong>Nombre:</strong> $name</p>";
             $mensaje .= "<p><strong>Correo:</strong> $email</p>";
             $mensaje .= "<p><strong>Teléfono:</strong> $phone</p>";
-            $mensaje .= "<p><strong>Dirección:</strong> $address</p>";
             $mensaje .= "<p><strong>Ubicación:</strong> $ubicacion</p>";
             $mensaje .= "<p><strong>Servicios solicitados:</strong> $servicios</p>";
             $mensaje .= "<p>Tipo de emergencia: Grave</p>";
@@ -98,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmt->close();
             $conn->close();
+
         } else {
             throw new Exception("Tipo de emergencia no válido");
         }
