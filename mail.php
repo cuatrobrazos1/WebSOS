@@ -1,23 +1,15 @@
 <?php
-// Cargar PHPMailer manualmente
-require 'PHPMailer-master/src/PHPMailer.php';
-require 'PHPMailer-master/src/SMTP.php';
-require 'PHPMailer-master/src/Exception.php';
-
+// Importar las clases necesarias de PHPMailer al principio del archivo
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Iniciar sesión para capturar el ID del usuario autenticado
 session_start();
 
-// Verificar que la sesión esté funcionando y que 'user_id' esté configurado
 if (!isset($_SESSION['user_id'])) {
-    http_response_code(403);
-    echo json_encode(["error" => "Usuario no autenticado"]);
-    exit;
+    throw new Exception("El usuario no ha iniciado sesión.");
 }
 
-$usuarioId = $_SESSION['user_id']; // Obtener el ID del usuario desde la sesión
+$usuarioId = $_SESSION['user_id']; // Usar 'user_id' de la sesión
 
 // Configuración de conexión a la base de datos
 $servername = "localhost";
@@ -26,7 +18,7 @@ $password = "";
 $dbname = "vitalsos";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $tipoEmergencia = $_POST['tipoEmergencia'] ?? null; // "grave" o "leve"
+    $tipoEmergencia = $_POST['tipoEmergencia'] ?? null;
 
     if (empty($tipoEmergencia)) {
         http_response_code(400);
@@ -34,22 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Inicializar PHPMailer
-    $mail = new PHPMailer(true);
-
     try {
-        // Configuración del servidor SMTP
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'vitalsosgrupo2@gmail.com';
-        $mail->Password = 'Vital1234';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-
-        $mail->setFrom('vitalsosgrupo2@gmail.com', 'Sistema de Emergencias');
-        $mail->isHTML(true);
-
         // Manejo de emergencia leve
         if ($tipoEmergencia === "leve") {
             $name = $_POST['name'] ?? 'No especificado';
@@ -65,9 +42,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje .= "<p><strong>Servicios solicitados:</strong> $servicios</p>";
             $mensaje .= "<p>Tipo de emergencia: Leve</p>";
 
-            $mail->addAddress($email);
-            $mail->Subject = "Emergencia Leve";
-            $mail->Body = $mensaje;
+            // Usar PHPMailer para enviar el correo
+            require 'vendor/autoload.php'; // Asegúrate de incluir el autoload de Composer
+
+            $mail = new PHPMailer(true);
+
+            try {
+                // Configuración del servidor SMTP
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';  // Cambia por el servidor SMTP adecuado
+                $mail->SMTPAuth = true;
+                $mail->Username = 'vitalsosgrupo2@gmail.com';  // Tu correo
+                $mail->Password = 'Vital1234';        // Tu contraseña de correo
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                // Remitente y destinatario
+                $mail->setFrom('tucorreo@gmail.com', 'Sistema de Emergencias');
+                $mail->addAddress($email);
+
+                // Contenido del correo
+                $mail->isHTML(true);
+                $mail->Subject = 'Emergencia Leve';
+                $mail->Body    = $mensaje;
+
+                $mail->send();
+
+            } catch (Exception $e) {
+                throw new Exception("Error al enviar el correo: {$mail->ErrorInfo}");
+            }
 
         // Manejo de emergencia grave
         } elseif ($tipoEmergencia === "grave") {
@@ -106,9 +109,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje .= "<p><strong>Servicios solicitados:</strong> $servicios</p>";
             $mensaje .= "<p>Tipo de emergencia: Grave</p>";
 
-            $mail->addAddress('destinatario@example.com');
-            $mail->Subject = "Emergencia Grave";
-            $mail->Body = $mensaje;
+            // Usar PHPMailer para enviar el correo
+            require 'vendor/autoload.php'; // Asegúrate de incluir el autoload de Composer
+
+            $mail = new PHPMailer(true);
+
+            try {
+                // Configuración del servidor SMTP
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';  // Cambia por el servidor SMTP adecuado
+                $mail->SMTPAuth = true;
+                $mail->Username = 'vitalsosgrupo2@gmail.com';  // Tu correo
+                $mail->Password = 'Vital1234';        // Tu contraseña de correo
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                // Remitente y destinatario
+                $mail->setFrom('tucorreo@gmail.com', 'Sistema de Emergencias');
+                $mail->addAddress('destinatario@example.com');  // Cambia el destinatario
+
+                // Contenido del correo
+                $mail->isHTML(true);
+                $mail->Subject = 'Emergencia Grave';
+                $mail->Body    = $mensaje;
+
+                $mail->send();
+
+            } catch (Exception $e) {
+                throw new Exception("Error al enviar el correo: {$mail->ErrorInfo}");
+            }
 
             $stmt->close();
             $conn->close();
@@ -117,7 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Tipo de emergencia no válido");
         }
 
-        $mail->send();
         echo json_encode(["success" => "Correo enviado y datos almacenados correctamente"]);
     } catch (Exception $e) {
         http_response_code(500);
@@ -127,3 +155,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     http_response_code(405);
     echo json_encode(["error" => "Método no permitido"]);
 }
+?>
