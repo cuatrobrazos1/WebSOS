@@ -14,7 +14,7 @@ $password = "";
 $dbname = "vitalsos";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $tipoEmergencia = $_POST['tipoEmergencia']; // "grave" o "leve"
+    $tipoEmergencia = $_POST['tipoEmergencia'] ?? null; // "grave" o "leve"
 
     if (empty($tipoEmergencia)) {
         http_response_code(400);
@@ -28,25 +28,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Configuración del servidor SMTP
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com'; // Servidor SMTP
+        $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'vitalsosgrupo2@gmail.com'; // Tu dirección de correo
-        $mail->Password = 'Vital1234'; // Tu contraseña o contraseña de aplicación
+        $mail->Username = 'vitalsosgrupo2@gmail.com';
+        $mail->Password = 'Vital1234';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        // Habilitar depuración
-        $mail->SMTPDebug = 2; // 2 muestra detalles completos del protocolo SMTP
-        $mail->Debugoutput = 'html'; // Salida en formato HTML (más legible)
-
-        $mail->setFrom('vitalsosgrupo2@gmail.com', 'Sistema de Emergencias'); // Dirección de envío
+        $mail->setFrom('vitalsosgrupo2@gmail.com', 'Sistema de Emergencias');
         $mail->isHTML(true);
 
         if ($tipoEmergencia === "leve") {
-            $name = $_POST['name'];
-            $email = $_POST['email'];
-            $phone = $_POST['phone'];
-            $address = $_POST['address'];
+            $name = $_POST['name'] ?? 'No especificado';
+            $email = $_POST['email'] ?? 'No especificado';
+            $phone = $_POST['phone'] ?? 'No especificado';
+            $address = $_POST['address'] ?? 'No especificado';
             $servicios = isset($_POST['servicio']) ? implode(", ", $_POST['servicio']) : "Ninguno";
 
             $mensaje = "<p><strong>Nombre:</strong> $name</p>";
@@ -56,22 +52,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje .= "<p><strong>Servicios solicitados:</strong> $servicios</p>";
             $mensaje .= "<p>Tipo de emergencia: Leve</p>";
 
-            $mail->addAddress($email); // Dirección del destinatario
+            $mail->addAddress($email);
             $mail->Subject = "Emergencia Leve";
             $mail->Body = $mensaje;
         } elseif ($tipoEmergencia === "grave") {
-            // Conexión a la base de datos y envío de correo
-            // (Este bloque sigue igual)
+            $name = $_POST['name'] ?? 'No especificado';
+            $email = $_POST['email'] ?? 'No especificado';
+            $phone = $_POST['phone'] ?? 'No especificado';
+            $address = $_POST['address'] ?? 'No especificado';
+            $ubicacion = $_POST['ubicacion'] ?? 'No especificado';
+            $servicios = isset($_POST['servicio']) ? implode(", ", $_POST['servicio']) : "Ninguno";
+
+            // Crear conexión a la base de datos
+            $conn = new mysqli($servername, $username, $password, $dbname);
+
+            if ($conn->connect_error) {
+                throw new Exception("Conexión fallida: " . $conn->connect_error);
+            }
+
+            $sql = "INSERT INTO emergencias (nombre_usuario, mail_usuario, telefono_usuario, ubicacion, servicios, tipo_emergencia) VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+
+            if (!$stmt) {
+                throw new Exception("Error al preparar la consulta SQL: " . $conn->error);
+            }
+
+            $tipoEmergenciaGrave = "grave";
+            $stmt->bind_param("ssisss", $name, $email, $phone, $ubicacion, $servicios, $tipoEmergenciaGrave);
+
+            if (!$stmt->execute()) {
+                throw new Exception("Error al guardar en la base de datos: " . $stmt->error);
+            }
+
+            $mensaje = "<p><strong>Nombre:</strong> $name</p>";
+            $mensaje .= "<p><strong>Correo:</strong> $email</p>";
+            $mensaje .= "<p><strong>Teléfono:</strong> $phone</p>";
+            $mensaje .= "<p><strong>Dirección:</strong> $address</p>";
+            $mensaje .= "<p><strong>Ubicación:</strong> $ubicacion</p>";
+            $mensaje .= "<p><strong>Servicios solicitados:</strong> $servicios</p>";
+            $mensaje .= "<p>Tipo de emergencia: Grave</p>";
+
+            $mail->addAddress('destinatario@example.com');
+            $mail->Subject = "Emergencia Grave";
+            $mail->Body = $mensaje;
+
+            $stmt->close();
+            $conn->close();
         } else {
             throw new Exception("Tipo de emergencia no válido");
         }
 
-        // Enviar el correo
         $mail->send();
-        echo json_encode(["success" => "Correo enviado correctamente"]);
+        echo json_encode(["success" => "Correo enviado y datos almacenados correctamente"]);
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(["error" => "Error al enviar el correo: " . $mail->ErrorInfo]);
+        echo json_encode(["error" => "Error al procesar la solicitud: " . $e->getMessage()]);
     }
 } else {
     http_response_code(405);
