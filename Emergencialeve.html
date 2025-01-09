@@ -1,4 +1,6 @@
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Formulario SOS</title>
@@ -7,18 +9,23 @@
 <body>
 <div class="sos-window">
   <h1 class="sos-title">Formulario de Emergencia</h1>
-  <form action="#" method="post">
+
+  <!-- Formulario para Emergencia Leve -->
+  <form action="mail.php" method="POST">
+    <input type="hidden" name="tipoEmergencia" value="leve">
+
     <label for="name">Nombre completo:</label>
-    <input type="text" id="name" name="name" placeholder="Ingresa tu nombre" required="">
+    <input type="text" id="name" name="name" placeholder="Ingresa tu nombre" required>
 
     <label for="email">Correo electrónico:</label>
-    <input type="email" id="email" name="email" placeholder="Ingresa tu correo" required="">
+    <input type="email" id="email" name="email" placeholder="Ingresa tu correo" required>
 
     <label for="phone">Número de teléfono:</label>
-    <input type="tel" id="phone" name="phone" placeholder="Ingresa tu teléfono" required="">
+    <input type="tel" id="phone" name="phone" placeholder="Ingresa tu teléfono" required>
 
     <label for="address">Dirección:</label>
-    <input type="text" id="address" name="address" placeholder="Ingresa tu dirección" required="">
+    <input type="text" id="address" name="address" placeholder="Ingresa tu dirección" required>
+
     <div class="checkbox-group">
       <label>
         <input value="policia" type="checkbox" id="policia" name="servicio[]">
@@ -33,17 +40,20 @@
         Avisar a la Ambulancia
       </label>
     </div>
-    <button type="submit" class="sos-button">Enviar Selección</button>
 
+    <button type="submit" class="sos-button">Enviar Selección</button>
   </form>
-  <div class ='under-button'>
-    <a href="EmergenciaGRAVE.html">
-      <button>EMERGENCIA</button>
-    </a>
+
+  <!-- Botón para Emergencia Grave -->
+  <div class='under-button'>
+    <form action="procesar_emergencia.php" method="POST">
+      <input type="hidden" name="tipoEmergencia" value="grave">
+      <button type="submit" class="emergencia-button">EMERGENCIA</button>
+    </form>
     <a href="PERSONAL.html">
       <button>Informacion Personal</button>
     </a>
   </div>
 </div>
-
-</body></html>
+</body>
+</html>
