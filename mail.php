@@ -10,6 +10,15 @@ use PHPMailer\PHPMailer\Exception;
 // Iniciar sesión para capturar el ID del usuario autenticado
 session_start();
 
+// Verificar que la sesión esté funcionando y que 'user_id' esté configurado
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(403);
+    echo json_encode(["error" => "Usuario no autenticado"]);
+    exit;
+}
+
+$usuarioId = $_SESSION['user_id']; // Obtener el ID del usuario desde la sesión
+
 // Configuración de conexión a la base de datos
 $servername = "localhost";
 $username = "root";
@@ -22,15 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($tipoEmergencia)) {
         http_response_code(400);
         echo json_encode(["error" => "Faltan datos requeridos"]);
-        exit;
-    }
-
-    // Obtener el ID del usuario desde la sesión
-    $usuarioId = $_SESSION['user_id'] ?? null;
-
-    if (empty($usuarioId)) {
-        http_response_code(403);
-        echo json_encode(["error" => "Usuario no autenticado"]);
         exit;
     }
 
