@@ -1,12 +1,5 @@
 <?php
 session_start();
-
-// Depuración: verificar si hay datos en la sesión
-if (isset($_SESSION['user_id'])) {
-    echo "Sesión ya iniciada para el usuario con ID: " . $_SESSION['user_id'];
-    exit;
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["correo"]) && isset($_POST["contrasena"])) {
         $mail = $_POST["correo"];
@@ -19,48 +12,40 @@ $username = "root";
 $password = "";
 $dbname = "vitalsos";
 
-// Conexión a la base de datos
 $mysqli = new mysqli($servername, $username, $password, $dbname);
 
-if ($mysqli->connect_error) {
-    die("Ha fallado la conexión: " . $mysqli->connect_error);
+if (!$mysqli) {
+    die("Ha fallado la conexion: " . mysqli_connect_error());
 }
 
-// Consulta para verificar el correo
-$sql = "SELECT ID_Usuario, nombre, telefono_emergencia, contraseña FROM usuarios WHERE mail = ?";
+// Ejecutar la consulta SQL para verificar el correo
+$sql = "SELECT ID_Usuario ,nombre, telefono_emergencia, contraseña FROM usuarios WHERE mail = '$mail'";
 
-$stmt = $mysqli->prepare($sql);
-$stmt->bind_param("s", $mail);
-$stmt->execute();
-$result = $stmt->get_result();
+$result = $mysqli->query($sql);
 
 // Verificar si el correo existe
-if ($result && $result->num_rows > 0) {
-    // Obtener los datos del usuario
-    $row = $result->fetch_assoc();
-
-    // Verificar la contraseña con password_verify
-    if (password_verify($pass, $row['contraseña'])) {
-        // Si la contraseña coincide
-        $_SESSION["user_id"] = $row["ID_Usuario"]; // Guardar el ID del usuario en la sesión
-        $_SESSION["nombre"] = $row["nombre"];
-        $_SESSION["mail"] = $mail;
-        $_SESSION["tel"] = $row["telefono_emergencia"];
-
-        // Depuración: verificar el contenido de la sesión
-        var_dump($_SESSION);
-
-        // Redirigir al panel de usuario
-        header("Location: PERSONAL.php");
+if ($result) {
+    $numRows = mysqli_num_rows($result);
+    if ($numRows == 0) {
+        echo "<p>El correo no está registrado.</p>";
     } else {
-        // Si la contraseña no coincide
-        echo "<p>El correo o la contraseña no son válidos.</p>";
+        // Obtener los datos del usuario
+        $row = mysqli_fetch_assoc($result);
+
+        // Verificar la contraseña con password_verify
+        if (password_verify($pass, $row['contraseña'])) {
+            // Si la contraseña coincide
+            $_SESSION["id"] = $row["ID_Usuario"];
+            $_SESSION["nombre"] = $row["nombre"];
+            $_SESSION["mail"] = $mail;
+            $_SESSION["tel"] = $row["telefono_emergencia"];
+            header("Location: PERSONAL.php");
+        } else {
+            $_SESSION["error"] = "El correo o la contraseña no son válidos.";
+            header("Location: inicioSesion.php");
+        }
     }
 } else {
-    echo "<p>El correo no está registrado.</p>";
+    echo "Error en la consulta SQL: " . $mysqli->error;
 }
-
-// Cerrar la conexión
-$stmt->close();
-$mysqli->close();
 ?>

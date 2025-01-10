@@ -28,6 +28,14 @@
         <button type="submit">Iniciar sesión</button>
     </form>
 
+    <?php
+        session_start();
+        if (isset($_SESSION['error'])) {
+        echo "<p>" . $_SESSION['error'] . "</p>";
+        unset($_SESSION['error']);
+    }
+    ?>
+
     <p>¿No tienes cuenta? <a href="registro.html">Registrarse</a></p>
 </section>
 
